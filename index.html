@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catch My Heart 💖</title>
+<style>
+  body {
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background: linear-gradient(135deg, #ffdde1, #fbc2eb);
+    animation: bgShift 30s infinite alternate;
+  }
+
+  @keyframes bgShift {
+    0% { background: linear-gradient(135deg, #ffdde1, #fbc2eb); }
+    50% { background: linear-gradient(135deg, #ff9a9e, #fecfef); }
+    100% { background: linear-gradient(135deg, #ffc3a0, #ffb6c1); }
+  }
+
+  .bg-heart {
+    position: absolute;
+    font-size: 20px;
+    opacity: 0.15;
+    animation: floatBackground linear infinite;
+    pointer-events: none;
+  }
+
+  @keyframes floatBackground {
+    0% { transform: translateY(100vh) rotate(0deg); }
+    100% { transform: translateY(-10vh) rotate(360deg); }
+  }
+
+  .heart {
+    position: absolute;
+    cursor: pointer;
+    text-shadow: 0 0 12px rgba(255, 105, 180, 0.8);
+    animation: float linear infinite;
+    transition: transform 0.3s ease, text-shadow 0.3s ease;
+  }
+
+  .heart:hover {
+    transform: scale(1.4);
+    text-shadow: 0 0 25px rgba(255, 105, 180, 1);
+  }
+
+  @keyframes float {
+    0% { transform: translateY(100vh) rotate(0deg); }
+    50% { transform: translateY(50vh) rotate(180deg); }
+    100% { transform: translateY(-10vh) rotate(360deg); }
+  }
+
+  .popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    width: 80%;
+    max-width: 450px;
+    background: rgba(255, 182, 193, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 25px;
+    padding: 30px 20px;
+    text-align: center;
+    font-size: 28px;
+    color: #fff;
+    box-shadow: 0 10px 25px rgba(255, 105, 180, 0.6);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  #popup-text {
+    font-weight: bold;
+    font-size: 28px;
+    color: #ff69b4; /* solid pink for sharp text */
+    text-shadow: 0 0 2px #fff, 0 0 5px #ff69b4, 0 0 8px #ff1493;
+    animation: glowText 1s infinite alternate;
+  }
+
+  @keyframes glowText {
+    0% { transform: scale(1); text-shadow: 0 0 2px #fff, 0 0 5px #ff69b4, 0 0 8px #ff1493; }
+    50% { transform: scale(1.05); text-shadow: 0 0 3px #fff, 0 0 8px #ff69b4, 0 0 12px #ff1493; }
+    100% { transform: scale(1); text-shadow: 0 0 2px #fff, 0 0 5px #ff69b4, 0 0 8px #ff1493; }
+  }
+
+  .popup.show { animation: popupIn 0.5s forwards; }
+  .popup.hide { animation: popupOut 0.5s forwards; }
+
+  @keyframes popupIn {
+    0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+    50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  }
+
+  @keyframes popupOut {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    100% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+  }
+
+  .popup-heart {
+    position: absolute;
+    font-size: 20px;
+    opacity: 1;
+    animation: popupHeart 1s forwards;
+  }
+
+  @keyframes popupHeart {
+    0% { transform: translate(0,0) scale(1); opacity: 1; }
+    100% { transform: translate(calc(-50px + 100 * var(--randX)px), calc(-50px + 100 * var(--randY)px)) scale(0.5); opacity: 0; }
+  }
+
+  #score {
+    position: fixed;
+    top: 15px;
+    right: 25px;
+    font-size: 26px;
+    font-weight: bold;
+    color: #ff4b5c;
+    text-shadow: 2px 2px 6px rgba(0,0,0,0.3);
+    z-index: 20;
+    transition: transform 0.3s ease;
+  }
+
+  #score.update { transform: scale(1.3); }
+
+  #love-meter-container {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    height: 20px;
+    background: rgba(255,255,255,0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 20;
+  }
+
+  #love-meter {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #ff6ec7, #ff8ec7);
+    transition: width 0.3s ease;
+  }
+</style>
+</head>
+<body>
+
+<div id="score">Caught: 0</div>
+<div id="love-meter-container"><div id="love-meter"></div></div>
+<div class="popup" id="popup"><p id="popup-text"></p></div>
+
+<script>
+const messages = [
+  "Hello madam😈",
+  "Chauk gyi kya😂",
+  "What can i say your boyfr has some talent yk😩",
+  "I got some other talents too👀",
+  "Your lips look so kissabe i swear to god",
+  "Makeout sesh when?👀",
+  "Dw i'll be on top...i'm your fan right?😘",
+  "Damn youre still going i guess you like me THAT much huh",
+  "I feel so sad for your boyfr youre here fooling around with me😔",
+  "But lmao fuck him right?😈",
+  "Anyways we look good together dont we?",
+  "We'll look even better in bed together yk👀",
+  "Kya yaar mahima rha nhi jaata na tumse mere bina?😏",
+  "Dimaag kam khaaya karo mera amma😘",
+  "I hate you",
+  "Ab padhne baitho kheli jaa rhi kyaa yaar",
+  "Physics ka paper hai inka soon aur dekho😂",
+  "Okay i'm serious... get off"
+];
+
+let score = 0;
+let comboTimer = null;
+let comboCount = 0;
+let msgIndex = 0; // Serial order message index
+
+// BACKGROUND HEARTS
+for(let i=0;i<25;i++){
+  const bgHeart = document.createElement("div");
+  bgHeart.classList.add("bg-heart");
+  bgHeart.textContent="💖";
+  bgHeart.style.left=Math.random()*100+"vw";
+  bgHeart.style.fontSize=(10+Math.random()*20)+"px";
+  bgHeart.style.animationDuration=(15+Math.random()*10)+"s";
+  document.body.appendChild(bgHeart);
+}
+
+// INTERACTIVE HEARTS
+function createHeart(){
+  const heart = document.createElement("div");
+  heart.classList.add("heart");
+  heart.textContent = "💖";
+  heart.style.left = Math.random()*90 + "vw";
+  heart.style.fontSize = (30 + Math.random()*30) + "px";
+  heart.style.animationDuration = (6 + Math.random()*4) + "s";
+  heart.style.transform = `rotate(${Math.random()*360}deg)`;
+  heart.style.color = `hsl(${Math.random()*360}, 80%, 70%)`;
+  heart.style.zIndex = Math.floor(Math.random()*100);
+
+  heart.addEventListener("click", () => {
+    showPopup(messages[msgIndex]);
+    msgIndex = (msgIndex + 1) % messages.length; // next message in order
+
+    createPopupHearts(12);
+    heart.style.transform += " scale(1.5)";
+    heart.style.opacity = "0";
+    setTimeout(()=>heart.remove(),200);
+
+    score++; updateScore();
+    comboCount++;
+    if(comboTimer) clearTimeout(comboTimer);
+    comboTimer = setTimeout(()=>{
+      if(comboCount >= 3) showPopup(`Combo x${comboCount}! 💕`);
+      comboCount=0;
+    },1000);
+
+    const meter = document.getElementById("love-meter");
+    meter.style.width = Math.min(score*5,100) + "%";
+  });
+
+  document.body.appendChild(heart);
+  setTimeout(()=>heart.remove(),10000);
+}
+
+// UPDATE SCORE
+function updateScore(){
+  const scoreEl = document.getElementById("score");
+  scoreEl.textContent = "Caught: "+score;
+  scoreEl.classList.add("update");
+  setTimeout(()=>scoreEl.classList.remove("update"),300);
+}
+
+// SHOW POPUP
+function showPopup(message){
+  const popup = document.getElementById("popup");
+  const popupText = document.getElementById("popup-text");
+  popupText.textContent = message;
+  popup.classList.remove("hide"); popup.classList.add("show");
+  popup.style.pointerEvents = "auto";
+  setTimeout(()=>{
+    popup.classList.remove("show"); popup.classList.add("hide");
+    popup.style.pointerEvents = "none";
+  },2500);
+}
+
+// POPUP HEARTS
+function createPopupHearts(count){
+  const popup = document.getElementById("popup");
+  for(let i=0;i<count;i++){
+    const ph = document.createElement("div");
+    ph.classList.add("popup-heart");
+    ph.textContent = "💖";
+    ph.style.setProperty('--randX', Math.random());
+    ph.style.setProperty('--randY', Math.random());
+    ph.style.left="50%"; ph.style.top="50%";
+    popup.appendChild(ph);
+    setTimeout(()=>ph.remove(),1000);
+  }
+}
+
+// HEART RAIN
+function heartRain(count=20){
+  for(let i=0;i<count;i++){
+    setTimeout(createHeart,i*200);
+  }
+}
+
+// HEART EXPLOSION ON DOUBLE CLICK
+document.body.addEventListener("dblclick",(e)=>{
+  for(let i=0;i<30;i++){
+    const ph = document.createElement("div");
+    ph.classList.add("popup-heart");
+    ph.textContent="💖";
+    ph.style.left = e.clientX + "px";
+    ph.style.top = e.clientY + "px";
+    ph.style.setProperty('--randX',(Math.random()-0.5)*3);
+    ph.style.setProperty('--randY',(Math.random()-0.5)*3);
+    ph.style.animation="popupHeart 1s forwards";
+    document.body.appendChild(ph);
+    setTimeout(()=>ph.remove(),1000);
+  }
+});
+
+// Start hearts immediately
+heartRain(25);
+setInterval(createHeart,2000);
+</script>
+</body>
+</html>
